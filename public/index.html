@@ -100,6 +100,7 @@
   submitBtn.addEventListener('click', async () => {
 
     const parsePdf = [
+      'Please, make as short relies as possible.',
       'Doc includes the exercise (in the border) and instruction what to do with it (above the text). ',
       'Post only the text'
     ]
@@ -115,8 +116,8 @@
     const exercise = await getExercise.json()
 
     const Anweisung = [
-      'Split the text into Anweisung and the other. ',
-      'Apply Anweisung to the second part of the text'
+      'Split the text into Anweisung and the exercise. ',
+      'Tell me only the text I should re-write'
     ]
 
     question = Anweisung.join()
@@ -127,7 +128,22 @@
       body: JSON.stringify({ question }),
     })
 
-    const data = await getReply.json()
+    const text = await getReply.json()
+
+    const Solution = [
+      'Apply Anweisung to the exercise',
+      'Tell me only the solution'
+    ]
+
+    question = Solution.join()
+
+    const getSolution = await fetch('/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+    })
+
+    const data = await getSolution.json()
 
     if (data.error) {
       responseDiv.textContent = 'Error: ' + data.error
