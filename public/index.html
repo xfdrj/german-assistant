@@ -63,7 +63,6 @@
 
 <div id="container">
   <input type="file" id="fileInput" accept=".pdf" />
-  <textarea id="questionInput" rows="4" placeholder="Ask a question..."></textarea>
   <button id="submitBtn">Submit</button>
 
   <div id="response"></div>
@@ -99,19 +98,37 @@
   })
 
   submitBtn.addEventListener('click', async () => {
-    const question = questionInput.value.trim()
-    if (!question) {
-      alert('Please enter a question.')
-      return
-    }
 
-    const res = await fetch('/ask', {
+    const parsePdf = [
+      'Doc includes the exercise (in the border) and instruction what to do with it (above the text). ',
+      'Post only the text'
+    ]
+
+    let question = parsePdf.join()
+
+    const getExercise = await fetch('/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question }),
     })
 
-    const data = await res.json()
+    const exercise = await getExercise.json()
+
+    const Anweisung = [
+      'Split the text into Anweisung and the other. ',
+      'Apply Anweisung to the second part of the text'
+    ]
+
+    question = Anweisung.join()
+
+    const getReply = await fetch('/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+    })
+
+    const data = await getReply.json()
+
     if (data.error) {
       responseDiv.textContent = 'Error: ' + data.error
     } else {
