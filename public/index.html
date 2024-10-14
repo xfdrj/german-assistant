@@ -99,56 +99,23 @@
 
   submitBtn.addEventListener('click', async () => {
 
-    const parsePdf = [
-      'Please, make as short relies as possible.',
-      'Doc includes the exercise (in the border) and instruction what to do with it (above the text). ',
-      'Post only the text'
-    ]
-
-    let question = parsePdf.join()
+    let INSTRUCTIONS = 'Please, make as short replies as possible. ' +
+            'Doc includes the exercise for German class. ' +
+            'What a student should do is written above the text in a border. ' +
+            'It is called question. In the border below there is a text. It is called exercise. ' +
+            'Apply question to the exercise. Post only the exercise.'
 
     const getExercise = await fetch('/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question: INSTRUCTIONS }),
     })
 
-    const exercise = await getExercise.json()
-
-    const Anweisung = [
-      'Split the text into Anweisung and the exercise. ',
-      'Tell me only the text I should re-write'
-    ]
-
-    question = Anweisung.join()
-
-    const getReply = await fetch('/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
-    })
-
-    const text = await getReply.json()
-
-    const Solution = [
-      'Apply Anweisung to the exercise',
-      'Tell me only the solution'
-    ]
-
-    question = Solution.join()
-
-    const getSolution = await fetch('/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
-    })
-
-    const data = await getSolution.json()
+    const data = await getExercise.json()
 
     if (data.error) {
       responseDiv.textContent = 'Error: ' + data.error
     } else {
-      responseDiv.innerHTML += `<div><strong>Q:</strong> ${question}</div>`
       responseDiv.innerHTML += `<div><strong>A:</strong> ${data.answer}</div>`
       questionInput.value = ''
       responseDiv.scrollTop = responseDiv.scrollHeight
