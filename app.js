@@ -5,11 +5,16 @@ import path from 'path'
 import multer from 'multer'
 import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
+import axios from "axios";
+
 dotenv.config()
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
+
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY
+const VOICE_ID = 'XB0fDUnXU5powFXDhCwa'
 
 const app = express()
 app.use(express.json())
@@ -178,6 +183,55 @@ app.post('/ask', async (req, res) => {
     res.json({ answer })
   } else {
     res.status(500).json({ error: 'Failed to retrieve answer.' })
+  }
+})
+
+app.post('/voice-over', async (req, res) => {
+  const { lyrics: textToVoice } = req.body
+
+  if (!textToVoice) {
+    return res.status(400).json({ error: 'No lyrics provided.' })
+  }
+
+  try {
+    const response = await axios.post(
+        `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+        {
+          text: textToVoice,
+          output_format: 'mp3_22050',
+          voice_settings: {
+            stability: 0.7,
+            similarity_boost: 0.75,
+            style: 0.2,
+          },
+        },
+        {
+          headers: {
+            'xi-api-key': ELEVENLABS_API_KEY,
+            'Content-Type': 'application/json',
+          },
+          responseType: 'arraybuffer',
+        }
+    )
+
+    const filePath = './public/generated_audio.mp3'
+    fs.writeFileSync(filePath, response.data)
+
+    console.log('Audio file saved as generated_audio.mp3')
+    res.json({ audioUrl: '/generated_audio.mp3' })
+  } catch (error) {
+    if(error?.message) {
+      console.error('Error during stream: message ', error.message)
+    } else if(error?.response?.data) {
+      console.error('Error during stream: response data', error.response.data)
+    } else if(error?.response){
+      console.error('Error during stream: response ', error.response)
+    }
+
+    console.log("ELEVENLABS_API_KEY: ", ELEVENLABS_API_KEY)
+
+    console.error('Error generating voice-over:', error.response ? error.response.data : error.message)
+    return res.status(500).json({ error: 'Failed to generate voice-over.' })
   }
 })
 

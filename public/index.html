@@ -66,6 +66,7 @@
   <button id="submitBtn">Submit</button>
 
   <div id="response"></div>
+  <button id="voiceOverButton" onclick="voiceOver()">Voice Over</button>
 </div>
 
 <script>
@@ -73,6 +74,7 @@
   const questionInput = document.getElementById('questionInput')
   const submitBtn = document.getElementById('submitBtn')
   const responseDiv = document.getElementById('response')
+  let textToVoice = ''
 
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files[0]
@@ -112,6 +114,7 @@
     })
 
     const data = await getExercise.json()
+    textToVoice = data.answer
 
     if (data.error) {
       responseDiv.textContent = 'Error: ' + data.error
@@ -121,6 +124,30 @@
       responseDiv.scrollTop = responseDiv.scrollHeight
     }
   })
+  
+  async function voiceOver() {
+    if (!textToVoice) {
+      alert('Nothing to voice over!')
+      return
+    }
+
+    const response = await fetch('/voice-over', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ lyrics: textToVoice }),
+    })
+
+    const data = await response.json()
+    if (data.audioUrl) {
+      const audioPlayer = document.createElement('audio')
+      audioPlayer.src = data.audioUrl
+      audioPlayer.controls = true
+      document.body.appendChild(audioPlayer)
+      audioPlayer.play()
+    }
+  }
 </script>
 </body>
 </html>
