@@ -3,21 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PDF Assistant</title>
+  <title>German Assistant</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f7f6;
-      color: #333;
+        background: rgb(2,0,36);
+        background: linear-gradient(90deg, rgba(2,0,36,1) 5%, rgba(208,57,226,1) 30%, rgba(0,212,255,1) 100%);color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
-    }
-    h1 {
-      color: #4caf50;
     }
     #container {
       width: 80%;
@@ -27,77 +24,122 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+
     textarea,
     input[type='file'],
-    button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-      font-size: 1rem;
+
+    #container {
+        width: 80%;
+        max-width: 800px;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    button {
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+
+    input#file {
+        display: inline-block;
+        width: 100%;
+        padding: 120px 0 0 0;
+        height: 100px;
+        overflow: hidden;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        background: url(upload.svg) center center no-repeat #f8f6f6;
+        border-radius: 20px;
+        background-size: 50px 50px;
     }
-    button:hover {
-      background-color: #45a049;
+
+    .button-container {
+        display: flex;
+        align-items: center; justify-content: center
     }
+
+    button#voiceOverButton {
+        display: inline-block;
+        width: 60px;
+        height: 60px;
+        border-radius: 20%;
+        padding: 120px 0 0 0;
+        overflow: hidden;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        background: url(mic.svg) center center no-repeat white;
+        border: none;
+        background-size: 50px 50px;
+    }
+
+    button#submitBtn {
+        display: inline-block;
+        width: 60px;
+        height: 60px;
+        border-radius: 20%;
+        padding: 120px 0 0 0;
+        overflow: hidden;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        background: url(go.svg) center center no-repeat white;
+        border: none;
+        background-size: 50px 50px;
+    }
+
     #response {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #f0f0f0;
-      border-radius: 5px;
-      max-height: 300px;
-      overflow-y: auto;
-      font-size: 1.1rem;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+        font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
-<h1>Ask Your Assistant</h1>
 
 <div id="container">
-  <input type="file" id="fileInput" accept=".pdf" />
-  <button id="submitBtn">Submit</button>
-
-  <div id="response"></div>
-  <button id="voiceOverButton" onclick="voiceOver()">Voice Over</button>
+    <input type="file" name="file" id="file" class="file">
+    <span id="value"></span>
+    <div class="button-container" >
+        <button id="submitBtn">Submit</button>
+        <button id="voiceOverButton" onclick="voiceOver()">Voice Over</button>
+    </div>
+    <div id="response"></div>
 </div>
 
 <script>
-  const fileInput = document.getElementById('fileInput')
-  const questionInput = document.getElementById('questionInput')
-  const submitBtn = document.getElementById('submitBtn')
-  const responseDiv = document.getElementById('response')
-  let textToVoice = ''
+    const questionInput = document.getElementById('questionInput')
+    const submitBtn = document.getElementById('submitBtn')
+    const responseDiv = document.getElementById('response')
+    let content = document.getElementById('response')
 
-  fileInput.addEventListener('change', async () => {
-    const file = fileInput.files[0]
-    if (!file) {
-      alert('Please select a PDF file.')
-      return
-    }
+    let textToVoice = ''
+    content.innerText = ' '
+    let file = document.getElementById('file');
 
-    const formData = new FormData()
-    formData.append('file', file)
+    file.addEventListener('change', async function () {
+            content.innerText = 'Upload started...'
+            let _file = file.files[0];
 
-    const res = await fetch('/upload', {
-      method: 'POST',
-      body: formData,
-    })
+            const formData = new FormData()
+            formData.append('file', _file)
 
-    const data = await res.json()
-    if (data.error) {
-      alert('Error uploading file: ' + data.error)
-    } else {
-      alert('File uploaded successfully')
-    }
-  })
+            const res = await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            })
+
+            const data = await res.json()
+            if (data.error) {
+                content.innerText = 'Error uploading file: ' + data.error
+            } else {
+                let content = document.getElementById('response')
+                content.innerText = 'File uploaded successfully'
+            }
+    });
+
 
   submitBtn.addEventListener('click', async () => {
 
