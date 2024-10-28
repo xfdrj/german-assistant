@@ -1,5 +1,5 @@
 ## GPT Assistants: File Search
-Simple app to solve German homework
+Simple app to solve German homework. See example of the task to solve in ./pdf/homework_example.pdf
 ### Installation
 - Clone the repository:
 ```
