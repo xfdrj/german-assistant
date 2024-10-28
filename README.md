@@ -1,5 +1,5 @@
 ## GPT Assistants: File Search
-This project implements an assistant using OpenAI that answers questions based on the content of a PDF file uploaded by the user through their browser. The assistant processes the PDF, stores it in a vector store, and allows the user to ask questions related to the PDF content.
+Simple app to solve German homework
 ### Installation
 - Clone the repository:
 ```
